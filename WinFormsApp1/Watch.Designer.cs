@@ -112,6 +112,8 @@
             button2 = new Button();
             button16 = new Button();
             toolTip1 = new ToolTip(components);
+            label16 = new Label();
+            comboBox16 = new ComboBox();
             SuspendLayout();
             // 
             // start
@@ -148,9 +150,9 @@
             // save
             // 
             save.Font = new Font("Segoe UI", 18F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            save.Location = new Point(536, 22);
+            save.Location = new Point(641, 28);
             save.Name = "save";
-            save.Size = new Size(146, 69);
+            save.Size = new Size(80, 69);
             save.TabIndex = 3;
             save.Text = "Save";
             toolTip1.SetToolTip(save, "Save ltotal and lap times");
@@ -930,20 +932,41 @@
             // button16
             // 
             button16.Font = new Font("Segoe UI", 18F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            button16.Location = new Point(700, 22);
+            button16.Location = new Point(737, 28);
             button16.Name = "button16";
-            button16.Size = new Size(146, 69);
+            button16.Size = new Size(80, 69);
             button16.TabIndex = 82;
             button16.Text = "Load";
             toolTip1.SetToolTip(button16, "Load a list of names");
             button16.UseVisualStyleBackColor = true;
             button16.Click += button16_Click;
             // 
+            // label16
+            // 
+            label16.AutoSize = true;
+            label16.Location = new Point(536, 9);
+            label16.Name = "label16";
+            label16.Size = new Size(89, 15);
+            label16.TabIndex = 83;
+            label16.Text = "Interval Start [s]";
+            // 
+            // comboBox16
+            // 
+            comboBox16.Font = new Font("Segoe UI", 18F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            comboBox16.FormattingEnabled = true;
+            comboBox16.Items.AddRange(new object[] { "0", "15", "30", "45", "60", "90", "120" });
+            comboBox16.Location = new Point(536, 37);
+            comboBox16.Name = "comboBox16";
+            comboBox16.Size = new Size(83, 40);
+            comboBox16.TabIndex = 84;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(858, 904);
+            Controls.Add(comboBox16);
+            Controls.Add(label16);
             Controls.Add(button16);
             Controls.Add(button2);
             Controls.Add(comboBox15a);
@@ -1118,5 +1141,7 @@
         private Button button2;
         private ToolTip toolTip1;
         private Button button16;
+        private Label label16;
+        private ComboBox comboBox16;
     }
 }

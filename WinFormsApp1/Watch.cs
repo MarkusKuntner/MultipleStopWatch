@@ -2,17 +2,21 @@ namespace WinFormsApp1
 {
     using System;
     using System.Diagnostics;
-    using System.Text.RegularExpressions;
     using System.Windows.Forms;
     using System.IO;
 
     public partial class Form1 : Form
     {
         public static Timer RunningTime;
+        public static Timer StartingTime;
         public static Stopwatch StopWatchTime;
         public static List<TimeSpan>[] itemTotalTime;
         public static List<TimeSpan>[] itemLapTime;
+        public static TimeSpan[] itemStartTime;
         public static int[] itemCount;
+        public static int IntervalStart = 0;
+        public static int IntervalStartCount = 0;
+        public static bool StartBeep = false;
 
         public Form1()
         {
@@ -23,6 +27,8 @@ namespace WinFormsApp1
         {
             itemTotalTime = new List<TimeSpan>[20];
             itemLapTime = new List<TimeSpan>[20];
+            itemStartTime = new TimeSpan[20];
+             
             for (int i = 0; i < 20; i++)
             {
                 itemTotalTime[i] = new List<TimeSpan>();
@@ -32,26 +38,84 @@ namespace WinFormsApp1
             StopWatchTime = new Stopwatch();
             RunningTime = new Timer();
             RunningTime.Interval = 100;
-            RunningTime.Tick += new EventHandler(TimerEventProcessor);
+            RunningTime.Tick += new EventHandler(TimerEventShowTime);
+            StartingTime = new Timer();
+            StartingTime.Tick += new EventHandler(TimerEventStartTime);
+
+            comboBox16.SelectedIndex = 0;
+            for (int i = 1; i < 16; i++)
+            {
+                Button btn = ButtonControl(i);
+                if (btn != null)
+                {
+                    btn.BackColor = Color.LightCoral;
+                    btn.Enabled = false;
+                }
+            }
         }
 
         private void start_Click(object sender, EventArgs e)
         {
+            IntervalStart = 0;
+            int.TryParse(comboBox16.Text, out IntervalStart);
+            
+            if (IntervalStart > 0)
+            {
+                StartingTime.Interval = IntervalStart * 1000;
+                StartingTime.Start();
+            }
+
+            //Clear arrays
+            Array.Clear(itemStartTime);
             for (int i = 0; i < 20; i++)
             {
                 itemTotalTime[i].Clear();
                 itemLapTime[i].Clear();
             }
+
             for (int i = 1; i <= 15; i++)
             {
-                ComboBox comboLeft = (ComboBox)this.Controls["comboBox" + (i).ToString()];
-                comboLeft.Items.Clear();
-                comboLeft.Text = string.Empty;
-                ComboBox comboRight = (ComboBox)this.Controls["comboBox" + (i).ToString() + "a"];
-                comboRight.Items.Clear();
-                comboRight.Text = string.Empty;
-                Label labelCount = (Label)this.Controls["label" + (i).ToString()];
-                labelCount.Text = "0";
+                ComboBox comboLeft = ComboBoxLeftControl(i);
+                if (comboLeft != null)
+                {
+                    comboLeft.Items.Clear();
+                    comboLeft.Text = string.Empty;
+                }
+                ComboBox comboRight = ComboBoxRightControl(i);
+                if (comboRight != null)
+                {
+                    comboRight.Items.Clear();
+                    comboRight.Text = string.Empty;
+                }
+                Label labelCount = LabelCounter(i);
+                if (labelCount != null)
+                {
+                    labelCount.Text = "0";
+                }
+                comboBox16.Enabled = false;
+            }
+
+            //enable buttons for the lap time
+            if (IntervalStart == 0)
+            {
+                for (int i = 1; i < 16; i++)
+                {
+                    Button btn = ButtonControl(i);
+                    if (btn != null)
+                    {
+                        btn.BackColor = Color.LightGreen;
+                        btn.Enabled = true;
+                    }
+                }
+            }
+            else
+            {
+                Button btn = ButtonControl(1);
+                if (btn != null)
+                {
+                    btn.BackColor = Color.LightGreen;
+                    btn.Enabled = true;
+                }
             }
 
             Array.Clear(itemCount);
@@ -60,14 +124,48 @@ namespace WinFormsApp1
             RunningTime.Start();
         }
 
+        private ComboBox ComboBoxLeftControl(int i)
+        {
+            return (ComboBox)this.Controls["comboBox" + i.ToString()];
+        }
+        private ComboBox ComboBoxRightControl(int i)
+        {
+            return (ComboBox)this.Controls["comboBox" + i.ToString() + "a"];
+        }
+        private Label LabelCounter(int i)
+        {
+            return (Label)this.Controls["label" + i.ToString()];
+        }
+        private TextBox TextBoxControl(int i)
+        {
+            return (TextBox)Controls["textBox" + i.ToString()];
+        }
+        private Button ButtonControl(int i)
+        {
+            return (Button)Controls["button" + i.ToString()];
+        }
+
         private void stop_Click(object sender, EventArgs e)
         {
             StopWatchTime.Stop();
             RunningTime.Stop();
+            StartingTime.Stop();
+
+            //disable buttons
+            for (int i = 1; i < 16; i++)
+            {
+                Button btn = ButtonControl(i);
+                if (btn != null)
+                {
+                    btn.BackColor = Color.LightCoral;
+                    btn.Enabled = false;
+                }
+            }
+            comboBox16.Enabled = true;
         }
 
-        // This is the method to run when the timer is raised.
-        private void TimerEventProcessor(Object myObject, EventArgs myEventArgs)
+        // This is the method to run when the timer for the time contol is raised.
+        private void TimerEventShowTime(Object myObject, EventArgs myEventArgs)
         {
             string newText = StopWatchTime.Elapsed.ToString(@"mm\:ss\.f");
             if (this.labelTimeSum.InvokeRequired)
@@ -79,16 +177,40 @@ namespace WinFormsApp1
                 this.labelTimeSum.Text = newText;
             }
         }
+        
+        // This is the method to run when the timer for the starting time is raised.
+        private void TimerEventStartTime(Object myObject, EventArgs myEventArgs)
+        {
+            IntervalStartCount++;
+            Button btn = (Button) this.Controls["button" + (IntervalStartCount + 1).ToString()];
+            
+            if (btn != null)
+            {
+                if (btn.InvokeRequired)
+                {
+                    btn.BeginInvoke((MethodInvoker)delegate () { btn.BackColor = Color.LightGreen; });
+                    btn.BeginInvoke((MethodInvoker)delegate () { btn.Enabled = true; });
+                }
+                else
+                {
+                    
+                    btn.BackColor = Color.LightGreen;
+                    btn.Enabled = true;
+                }
+            }
+            itemStartTime[IntervalStartCount] = StopWatchTime.Elapsed;            
+        }
 
+        //LapTimes
         private void button1_Click(object sender, EventArgs e)
         {
             Button bt = (Button)sender;
             string text = (new String(bt.Name.ToString().Where(Char.IsDigit).ToArray()));
             int line = Convert.ToInt32(text) - 1;
             TimeSpan lapTime;
-            itemTotalTime[line].Add(StopWatchTime.Elapsed);
+            itemTotalTime[line].Add(StopWatchTime.Elapsed - itemStartTime[line]);
 
-            ComboBox comboLeft = (ComboBox)this.Controls["comboBox" + (line + 1).ToString()];
+            ComboBox comboLeft = ComboBoxLeftControl(line + 1);
             if (comboLeft != null)
             {
                 comboLeft.Items.Add(itemTotalTime[line][itemTotalTime[line].Count() - 1].ToString(@"mm\:ss\.f"));
@@ -104,15 +226,20 @@ namespace WinFormsApp1
                 lapTime = itemTotalTime[line][itemTotalTime[line].Count() - 1];
             }
             itemLapTime[line].Add(lapTime);
-            ComboBox comboRight = (ComboBox)Controls["comboBox" + (line + 1).ToString() + "a"];
+            ComboBox comboRight = ComboBoxRightControl(line +1 );
             if (comboRight != null)
             {
                 comboRight.Items.Add(lapTime.ToString(@"mm\:ss\.f"));
                 comboRight.Text = lapTime.ToString(@"mm\:ss\.f");
             }
             itemCount[line]++;
-            Label labelCount = (Label)Controls["label" + (line + 1).ToString()];
-            labelCount.Text = itemCount[line].ToString();
+            Label labelCount = LabelCounter(line + 1);
+            if (labelCount != null)
+            {
+                labelCount.Text = itemCount[line].ToString();
+            }
+
+           // MessageBox.Show(itemStartTime[line].ToString() +"\n" + itemTotalTime[line][itemTotalTime[line].Count() - 1]);
         }
 
         private void save_Click(object sender, EventArgs e)
@@ -131,7 +258,7 @@ namespace WinFormsApp1
                         for (int i = 0; i < 15; i++)
                         {
                             string line = string.Empty;
-                            TextBox text = (TextBox)Controls["textBox" + (i + 1).ToString()];
+                            TextBox text = TextBoxControl(i + 1);
                             if (text != null)
                             {
                                 if (text.Text.Length > 0)
@@ -139,7 +266,7 @@ namespace WinFormsApp1
                                     line += text.Text + "\t";
                                     for (int lapTimes = 0; lapTimes < itemTotalTime[i].Count; lapTimes++)
                                     {
-                                        line += itemTotalTime[i][lapTimes].ToString(@"mm\:ss\.f") + "\t";
+                                        line += itemTotalTime[i][lapTimes].ToString(@"mm\:ss\.f", System.Globalization.CultureInfo.CurrentUICulture).Replace('.', Convert.ToChar(Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator)) + "\t";
                                     }
                                     sw.WriteLine(line);
                                 }
@@ -151,7 +278,7 @@ namespace WinFormsApp1
                         for (int i = 0; i < 15; i++)
                         {
                             string line = string.Empty;
-                            TextBox text = (TextBox)Controls["textBox" + (i + 1).ToString()];
+                            TextBox text = TextBoxControl(i + 1);
                             if (text != null)
                             {
                                 if (text.Text.Length > 0)
@@ -160,7 +287,7 @@ namespace WinFormsApp1
 
                                     for (int lapTimes = 0; lapTimes < itemLapTime[i].Count; lapTimes++)
                                     {
-                                        line += itemLapTime[i][lapTimes].ToString(@"mm\:ss\.f") + "\t";
+                                        line += itemLapTime[i][lapTimes].ToString(@"mm\:ss\.f", System.Globalization.CultureInfo.CurrentUICulture).Replace('.', Convert.ToChar(Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator)) + "\t";
                                     }
                                     sw.WriteLine(line);
                                 }
@@ -215,7 +342,7 @@ namespace WinFormsApp1
                 {
                     if (i < names.Count)
                     {
-                        TextBox text = (TextBox)Controls["textBox" + (i + 1).ToString()];
+                        TextBox text = TextBoxControl(i + 1);
                         if (text != null)
                         {
                             text.Text = names[i];
