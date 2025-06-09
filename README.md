@@ -2,7 +2,7 @@ This is a simple stopwatch app for up to 15 athletes with lap timer.
 The athlete names can be entered in the app or read in via a text file. 
 The stopped lap and total times can be written to a text file that can be read into spreadsheet programs.
 
-![Screenshot](WinFormsApp1/Screenshot.jpg){ width=50% }
+![Screenshot](WinFormsApp1/Screenshot.jpg)
 
 ## Written in
 C# DotNet 8.0
