@@ -6,13 +6,8 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
-    <ApplicationIcon>Gral.ico</ApplicationIcon>
     <SignAssembly>False</SignAssembly>
     <Copyright>©Markus Kuntner</Copyright>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Content Include="Gral.ico" />
-  </ItemGroup>
 
 </Project>
