@@ -23,12 +23,15 @@ namespace WinFormsApp1
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Init the form
+        /// </summary>
         private void Form1_Load(object sender, EventArgs e)
         {
             itemTotalTime = new List<TimeSpan>[20];
             itemLapTime = new List<TimeSpan>[20];
             itemStartTime = new TimeSpan[20];
-             
+
             for (int i = 0; i < 20; i++)
             {
                 itemTotalTime[i] = new List<TimeSpan>();
@@ -54,11 +57,15 @@ namespace WinFormsApp1
             }
         }
 
+        /// <summary>
+        /// Start the timer
+        /// </summary>
         private void start_Click(object sender, EventArgs e)
         {
             IntervalStart = 0;
+            IntervalStartCount = 0;
             int.TryParse(comboBox16.Text, out IntervalStart);
-            
+
             if (IntervalStart > 0)
             {
                 StartingTime.Interval = IntervalStart * 1000;
@@ -145,6 +152,9 @@ namespace WinFormsApp1
             return (Button)Controls["button" + i.ToString()];
         }
 
+        /// <summary>
+        /// Stop the timer
+        /// </summary>
         private void stop_Click(object sender, EventArgs e)
         {
             StopWatchTime.Stop();
@@ -164,7 +174,9 @@ namespace WinFormsApp1
             comboBox16.Enabled = true;
         }
 
-        // This is the method to run when the timer for the time contol is raised.
+        /// <summary>
+        /// This is the method to run when the timer for the time contol is raised.
+        /// </summary>
         private void TimerEventShowTime(Object myObject, EventArgs myEventArgs)
         {
             string newText = StopWatchTime.Elapsed.ToString(@"mm\:ss\.f");
@@ -177,13 +189,15 @@ namespace WinFormsApp1
                 this.labelTimeSum.Text = newText;
             }
         }
-        
-        // This is the method to run when the timer for the starting time is raised.
+
+        /// <summary>
+        /// This is the method to run when the timer for the starting time is raised.
+        /// </summary>
         private void TimerEventStartTime(Object myObject, EventArgs myEventArgs)
         {
             IntervalStartCount++;
-            Button btn = (Button) this.Controls["button" + (IntervalStartCount + 1).ToString()];
-            
+            Button btn = (Button)this.Controls["button" + (IntervalStartCount + 1).ToString()];
+
             if (btn != null)
             {
                 if (btn.InvokeRequired)
@@ -193,15 +207,24 @@ namespace WinFormsApp1
                 }
                 else
                 {
-                    
+
                     btn.BackColor = Color.LightGreen;
                     btn.Enabled = true;
                 }
             }
-            itemStartTime[IntervalStartCount] = StopWatchTime.Elapsed;            
+            itemStartTime[IntervalStartCount] = StopWatchTime.Elapsed;
+
+            // Final button reached
+            if (IntervalStartCount >= 14)
+            {
+                StartingTime.Stop();
+                IntervalStartCount = 0;
+            }
         }
 
-        //LapTimes
+        /// <summary>
+        /// Evaluate and store the lap times
+        /// </summary>
         private void button1_Click(object sender, EventArgs e)
         {
             Button bt = (Button)sender;
@@ -226,7 +249,7 @@ namespace WinFormsApp1
                 lapTime = itemTotalTime[line][itemTotalTime[line].Count() - 1];
             }
             itemLapTime[line].Add(lapTime);
-            ComboBox comboRight = ComboBoxRightControl(line +1 );
+            ComboBox comboRight = ComboBoxRightControl(line + 1);
             if (comboRight != null)
             {
                 comboRight.Items.Add(lapTime.ToString(@"mm\:ss\.f"));
@@ -239,9 +262,12 @@ namespace WinFormsApp1
                 labelCount.Text = itemCount[line].ToString();
             }
 
-           // MessageBox.Show(itemStartTime[line].ToString() +"\n" + itemTotalTime[line][itemTotalTime[line].Count() - 1]);
+            // MessageBox.Show(itemStartTime[line].ToString() +"\n" + itemTotalTime[line][itemTotalTime[line].Count() - 1]);
         }
 
+        /// <summary>
+        /// save the results to disc
+        /// </summary>
         private void save_Click(object sender, EventArgs e)
         {
             SaveFileDialog saveFileDialog1 = new SaveFileDialog();
@@ -303,6 +329,9 @@ namespace WinFormsApp1
             }
         }
 
+        /// <summary>
+        /// Load a list of athlete names
+        /// </summary>
         private void button16_Click(object sender, EventArgs e)
         {
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
@@ -350,6 +379,54 @@ namespace WinFormsApp1
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// copy the results to the clipboard
+        /// </summary>
+        private void button17_Click(object sender, EventArgs e)
+        {
+            string clip = "Total Time" + Environment.NewLine;
+            
+            for (int i = 0; i < 15; i++)
+            {
+                string line = string.Empty;
+                TextBox text = TextBoxControl(i + 1);
+                if (text != null)
+                {
+                    if (text.Text.Length > 0)
+                    {
+                        line += text.Text + "\t";
+                        for (int lapTimes = 0; lapTimes < itemTotalTime[i].Count; lapTimes++)
+                        {
+                            line += itemTotalTime[i][lapTimes].ToString(@"mm\:ss\.f", System.Globalization.CultureInfo.CurrentUICulture).Replace('.', Convert.ToChar(Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator)) + "\t";
+                        }
+                        clip += line + Environment.NewLine;
+                    }
+                }
+
+            }
+
+            clip += "Lap Time" + Environment.NewLine;
+            for (int i = 0; i < 15; i++)
+            {
+                string line = string.Empty;
+                TextBox text = TextBoxControl(i + 1);
+                if (text != null)
+                {
+                    if (text.Text.Length > 0)
+                    {
+                        line += text.Text + "\t";
+
+                        for (int lapTimes = 0; lapTimes < itemLapTime[i].Count; lapTimes++)
+                        {
+                            line += itemLapTime[i][lapTimes].ToString(@"mm\:ss\.f", System.Globalization.CultureInfo.CurrentUICulture).Replace('.', Convert.ToChar(Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator)) + "\t";
+                        }
+                        clip += line + Environment.NewLine;
+                    }
+                }
+            }
+            System.Windows.Forms.Clipboard.SetText(clip);
         }
 
     }
