@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             start = new Button();
             stop = new Button();
             labelTimeSum = new Label();
@@ -114,6 +115,7 @@
             toolTip1 = new ToolTip(components);
             label16 = new Label();
             comboBox16 = new ComboBox();
+            button17 = new Button();
             SuspendLayout();
             // 
             // start
@@ -121,7 +123,7 @@
             start.Font = new Font("Segoe UI", 18F, FontStyle.Regular, GraphicsUnit.Point, 0);
             start.Location = new Point(39, 22);
             start.Name = "start";
-            start.Size = new Size(146, 69);
+            start.Size = new Size(115, 69);
             start.TabIndex = 0;
             start.Text = "&Start";
             start.UseVisualStyleBackColor = true;
@@ -130,9 +132,9 @@
             // stop
             // 
             stop.Font = new Font("Segoe UI", 18F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            stop.Location = new Point(204, 22);
+            stop.Location = new Point(170, 22);
             stop.Name = "stop";
-            stop.Size = new Size(146, 69);
+            stop.Size = new Size(115, 69);
             stop.TabIndex = 1;
             stop.Text = "Stop";
             stop.UseVisualStyleBackColor = true;
@@ -141,7 +143,7 @@
             // labelTimeSum
             // 
             labelTimeSum.Font = new Font("Segoe UI", 26.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            labelTimeSum.Location = new Point(372, 28);
+            labelTimeSum.Location = new Point(300, 28);
             labelTimeSum.Name = "labelTimeSum";
             labelTimeSum.Size = new Size(167, 52);
             labelTimeSum.TabIndex = 2;
@@ -150,12 +152,12 @@
             // save
             // 
             save.Font = new Font("Segoe UI", 18F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            save.Location = new Point(641, 28);
+            save.Location = new Point(574, 28);
             save.Name = "save";
             save.Size = new Size(80, 69);
             save.TabIndex = 3;
             save.Text = "Save";
-            toolTip1.SetToolTip(save, "Save ltotal and lap times");
+            toolTip1.SetToolTip(save, "Save total and lap times");
             save.UseVisualStyleBackColor = true;
             save.Click += save_Click;
             // 
@@ -932,7 +934,7 @@
             // button16
             // 
             button16.Font = new Font("Segoe UI", 18F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            button16.Location = new Point(737, 28);
+            button16.Location = new Point(749, 28);
             button16.Name = "button16";
             button16.Size = new Size(80, 69);
             button16.TabIndex = 82;
@@ -944,7 +946,7 @@
             // label16
             // 
             label16.AutoSize = true;
-            label16.Location = new Point(536, 9);
+            label16.Location = new Point(467, 9);
             label16.Name = "label16";
             label16.Size = new Size(89, 15);
             label16.TabIndex = 83;
@@ -955,16 +957,30 @@
             comboBox16.Font = new Font("Segoe UI", 18F, FontStyle.Regular, GraphicsUnit.Point, 0);
             comboBox16.FormattingEnabled = true;
             comboBox16.Items.AddRange(new object[] { "0", "15", "30", "45", "60", "90", "120" });
-            comboBox16.Location = new Point(536, 37);
+            comboBox16.Location = new Point(467, 37);
             comboBox16.Name = "comboBox16";
-            comboBox16.Size = new Size(83, 40);
+            comboBox16.Size = new Size(89, 40);
             comboBox16.TabIndex = 84;
+            // 
+            // button17
+            // 
+            button17.BackgroundImage = (Image)resources.GetObject("button17.BackgroundImage");
+            button17.BackgroundImageLayout = ImageLayout.Stretch;
+            button17.Font = new Font("Segoe UI", 18F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            button17.Location = new Point(668, 28);
+            button17.Name = "button17";
+            button17.Size = new Size(69, 69);
+            button17.TabIndex = 85;
+            toolTip1.SetToolTip(button17, "Copy results to the Clipboard");
+            button17.UseVisualStyleBackColor = true;
+            button17.Click += button17_Click;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(858, 904);
+            Controls.Add(button17);
             Controls.Add(comboBox16);
             Controls.Add(label16);
             Controls.Add(button16);
@@ -1143,5 +1159,6 @@
         private Button button16;
         private Label label16;
         private ComboBox comboBox16;
+        private Button button17;
     }
 }
