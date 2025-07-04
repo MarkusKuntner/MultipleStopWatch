@@ -231,15 +231,8 @@ namespace WinFormsApp1
             string text = (new String(bt.Name.ToString().Where(Char.IsDigit).ToArray()));
             int line = Convert.ToInt32(text) - 1;
             TimeSpan lapTime;
+            
             itemTotalTime[line].Add(StopWatchTime.Elapsed - itemStartTime[line]);
-
-            ComboBox comboLeft = ComboBoxLeftControl(line + 1);
-            if (comboLeft != null)
-            {
-                comboLeft.Items.Add(itemTotalTime[line][itemTotalTime[line].Count() - 1].ToString(@"mm\:ss\.f"));
-                comboLeft.Text = itemTotalTime[line][itemTotalTime[line].Count() - 1].ToString(@"mm\:ss\.f");
-            }
-
             if (itemCount[line] > 0)
             {
                 lapTime = itemTotalTime[line][itemTotalTime[line].Count() - 1] - itemTotalTime[line][itemTotalTime[line].Count() - 2];
@@ -248,6 +241,21 @@ namespace WinFormsApp1
             {
                 lapTime = itemTotalTime[line][itemTotalTime[line].Count() - 1];
             }
+            
+            //avoid very short lap times < 2 s
+            if (lapTime < new TimeSpan(0, 0, 0, 2))
+            {
+                itemTotalTime[line].RemoveAt(itemTotalTime[line].Count - 1);
+                return;
+            }
+
+            ComboBox comboLeft = ComboBoxLeftControl(line + 1);
+            if (comboLeft != null)
+            {
+                comboLeft.Items.Add(itemTotalTime[line][itemTotalTime[line].Count() - 1].ToString(@"mm\:ss\.f"));
+                comboLeft.Text = itemTotalTime[line][itemTotalTime[line].Count() - 1].ToString(@"mm\:ss\.f");
+            }
+           
             itemLapTime[line].Add(lapTime);
             ComboBox comboRight = ComboBoxRightControl(line + 1);
             if (comboRight != null)
